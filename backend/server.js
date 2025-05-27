@@ -1,8 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const PORT = process.env.PORT || 3000;
+
+// Initialize Express app
 const app = express();
 
+// Middleware to parse incoming JSON
 app.use(express.json());
 
 
