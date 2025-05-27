@@ -14,13 +14,13 @@ Now it's time to plan your backend structure, starting with the Task model and A
 Let’s define what operations (CRUD) the user needs on “tasks”:
 
 Action	HTTP Method	Route	Description
-Create a task	POST	/api/tasks	Add a new task
-Read all tasks	GET	/api/tasks	Get all tasks
-Read one task	GET	/api/tasks/:id	Get task by ID
-Update a task	PUT	/api/tasks/:id	Edit task info
-Delete a task	DELETE	/api/tasks/:id	Remove task
-Comment on task	POST	/api/tasks/:id/comments	Add comment
-Claim task	PATCH	/api/tasks/:id/claim	Mark as claimed
+Create a task	POST	/api/v1/tasks	Add a new task
+Read all tasks	GET	/api/v1/tasks	Get all tasks
+Read one task	GET	/api/v1/tasks/:id	Get task by ID
+Update a task	PUT	/api/v1/tasks/:id	Edit task info
+Delete a task	DELETE	/api/v1/tasks/:id	Remove task
+Comment on task	POST	/api/v1/tasks/:id/comments	Add comment
+Claim task	PATCH	/api/v1/tasks/:id/claim	Mark as claimed
 🧱 2. What Data Should a Task Have?
 We’re not writing the Mongoose model yet — but think like a data architect. Each task should have:
 
