@@ -17,9 +17,30 @@ app.use(express.json());
 app.use('/api/v1/tasks', taskRouter);
 app.use('/api/v1/users', userRouter);
 
+
+// 404 handler for unmatched routes this is middleware
+app.use((req, res, next) => {
+    res.status(404).json({
+        status: 'fail',
+        message: `Route ${req.originalUrl} not found`
+    });
+});
+
+// Centralized error handler for 500 and other errors
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+        status: 'error',
+        message: err.message || 'Internal Server Error'
+    });
+});
+
+
+
 // ========== /////////// =========== //
 // ========== Server Started ======== //
 
 app.listen(PORT, () => {
     console.log(`Server started on port...${PORT}`);
 })
+
