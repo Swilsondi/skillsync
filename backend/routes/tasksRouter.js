@@ -1,25 +1,15 @@
 const express = require('express');
 const router = express.Router();
-//So this is the event handler function that we specify to execute when the req status is succesful
+const tasksController = require('../controllers/tasksController');
+// This file defines all the routes for "tasks" and connects them to controller functions.
 
+// Example of a simple route handler (for reference, not used below)
+// const getAllTasks = (req, res) => { ... }
 
-//Get all user tasks
-const getAllTasks = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        message: 'You can succesfully get all tasks from this route'
-    });
-};
+// Controller functions handle the actual logic for each route.
+// You can swap out the inline handlers below for controller functions as you build them.
 
-//Create Tasks
-const createTasks = (req, res) => {
-    res.status(201).json({
-        status: 'success',
-        message: 'You successfully created this task and route'
-    });
-};
-
-//Get task by id
+// Get task by id (currently a placeholder, replace with controller logic as needed)
 const getTaskId = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -27,7 +17,7 @@ const getTaskId = (req, res) => {
     });
 };
 
-//Edit Task
+// Edit Task
 const editTask = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -35,7 +25,7 @@ const editTask = (req, res) => {
     });
 };
 
-//Remove Task
+// Remove Task
 const removeTask = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -43,7 +33,7 @@ const removeTask = (req, res) => {
     });
 };
 
-//Get comment
+// Get comment
 const getComment = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -51,7 +41,7 @@ const getComment = (req, res) => {
     });
 };
 
-//Mark as claimed
+// Mark as claimed
 const markClaimed = (req, res) => {
     res.status(201).json({
         status: 'success',
@@ -59,7 +49,7 @@ const markClaimed = (req, res) => {
     });
 };
 
-//Add comment
+// Add comment
 const addComment = (req, res) => {
     res.status(201).json({
         status: 'success',
@@ -67,19 +57,22 @@ const addComment = (req, res) => {
     });
 };
 
-router
-    .get('/', getAllTasks)
-    .post('/', createTasks);
+// ================= ROUTES =================
 
+// Main collection routes (use controller logic for DB access)
+router
+    .get('/', tasksController.getAllTasks)      // GET all tasks
+    .post('/', tasksController.createTasks);    // POST create a new task
+
+// Individual task routes (currently using inline handlers, swap for controllers as you build them)
+router
+    .get('/:id', getTaskId)                     // GET a task by ID
+    .put('/:id', editTask)                      // PUT update a task by ID
+    .delete('/:id', removeTask)                 // DELETE a task by ID
+    .get('/:id/comments', getComment)           // GET comments for a task
+    .post('/:id/comments', addComment);         // POST add a comment to a task
 
 router
-    .get('/:id', getTaskId)
-    .put('/:id', editTask)
-    .delete('/:id', removeTask)
-    .get('/:id/comments', getComment)
-    .post('/:id/comments', addComment);
-
-router
-    .get('/:id/claim', markClaimed);
+    .get('/:id/claim', markClaimed);            // GET (should be PATCH) mark a task as claimed
 
 module.exports = router;
