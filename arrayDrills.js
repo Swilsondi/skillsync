@@ -76,7 +76,7 @@ const donors = donations.reduce((acc, curr) => {
      return acc;
 }, {})
 
-console.log(donors);
+// console.log(donors);
 // {
 //   Ella: 60,
 //   Max: 35,
@@ -128,3 +128,42 @@ console.log(donors);
 
 // If not: create it
 
+const people = [
+  { name: "Anna", age: 22 },
+  { name: "Ben", age: 35 },
+  { name: "Charlie", age: 29 },
+  { name: "Diana", age: 42 },
+  { name: "Eva", age: 18 },
+  { name: "Frank", age: 34 }
+];
+
+const data = people.reduce((acc, curr) => {
+    const age = curr.age;
+    if (age < 30){
+      acc.under30 += 1;
+    }  else {
+     acc.above30 += 1;
+    }
+    return acc;
+}, { under30: 0, above30: 0 })
+
+// console.log(data);
+// {
+//   under30: 3,
+//   30andAbove: 3
+// }
+
+
+const users = [
+  { name: "Ava", role: "admin" },
+  { name: "Noah", role: "user" },
+  { name: "Mia", role: "user" },
+  { name: "Zane", role: "admin" },
+  { name: "Liam", role: "moderator" }
+];
+
+// {
+//   admin: ["Ava", "Zane"],
+//   user: ["Noah", "Mia"],
+//   moderator: ["Liam"]
+// }
