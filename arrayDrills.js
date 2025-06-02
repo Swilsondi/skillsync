@@ -188,14 +188,37 @@ const skills = [
   { name: "Liam", language: "Python" },
 ];
 
-const languagues = skills.reduce((acc, curr) => {
-  const languages = curr.language;
+const languages = skills.reduce((acc, curr) => {
+  const lang = curr.language;
   const name = curr.name;
-  if (!acc[name]) {
-    acc[name].push(languages);
-  } else {
-    acc[name] = [];
+  if (!acc[lang]) {
+    acc[lang] =[];
   }
+  acc[lang].push(name);
+
   return acc;
-})
+},{});
+
 console.log(languages);
+
+const donationsNew = [
+  { donor: "Ella", amount: 20 },
+  { donor: "Max", amount: 35 },
+  { donor: "Ella", amount: 40 },
+  { donor: "Leo", amount: 15 }
+];
+
+const amounts = donationsNew.reduce((acc, curr) => {
+    const donor = curr.donor;
+    const amount = curr.amount;
+    if (!acc[donor]) {
+      acc[donor] = amount;
+    } else {
+      acc[donor] += amount;
+    }
+    return acc;
+
+}, {})
+console.log(amounts);
+
+//In this logic we are declaring the acc value we started with as the object. Then we have acc[donor] check if that value is not true aka falsy. From there if it is falsy which will happen on the first, second and third iterations. then we set acc[donor] to equal the amount because it is the first time we are seeing it. Else if we have already seen acc[donor] before then we set acc[donor] = acc[donor] + amount; This adds the previous amount we had stored in the acc at that specific iteration. The acc gets bigger and holds the data from the users depending on how many times we are looping through the original array and what we want to store and return.
