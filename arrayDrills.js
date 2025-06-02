@@ -162,8 +162,40 @@ const users = [
   { name: "Liam", role: "moderator" }
 ];
 
+const user = users.reduce((acc, curr) => {
+    const role = curr.role;
+    const name = curr.name;
+    if (!acc[role]) {
+      acc[role] = []; 
+    } else {
+      acc[role].push(name);
+    }
+    return acc;
+}, {})
+
+// console.log(user);
 // {
 //   admin: ["Ava", "Zane"],
 //   user: ["Noah", "Mia"],
 //   moderator: ["Liam"]
 // }
+
+const skills = [
+  { name: "Ava", language: "JavaScript" },
+  { name: "Noah", language: "Python" },
+  { name: "Mia", language: "JavaScript" },
+  { name: "Zane", language: "Ruby" },
+  { name: "Liam", language: "Python" },
+];
+
+const languagues = skills.reduce((acc, curr) => {
+  const languages = curr.language;
+  const name = curr.name;
+  if (!acc[name]) {
+    acc[name].push(languages);
+  } else {
+    acc[name] = [];
+  }
+  return acc;
+})
+console.log(languages);
