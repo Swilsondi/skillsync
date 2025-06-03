@@ -65,6 +65,7 @@ router
     .post('/', tasksController.createTasks);    // POST create a new task
 
 // Individual task routes (currently using inline handlers, swap for controllers as you build them)
+//This listens for a GET request at /api/v1/tasks (because in server.js you mounted it at /api/v1/tasks)
 router
     .get('/:id', getTaskId)                     // GET a task by ID
     .put('/:id', editTask)                      // PUT update a task by ID
