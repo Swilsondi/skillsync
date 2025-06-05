@@ -73,6 +73,6 @@ router
     .post('/:id/comments', addComment);         // POST add a comment to a task
 
 router
-    .get('/:id/claim', markClaimed);            // GET (should be PATCH) mark a task as claimed
+    .patch('/:id/claim', markClaimed);            // PATCH mark a task as claimed
 
 module.exports = router;
