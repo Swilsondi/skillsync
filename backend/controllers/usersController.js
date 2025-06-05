@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 //Get users
 exports.getAllUsers = async (req, res, next) => {
     try {
@@ -32,27 +33,76 @@ catch (err){
 };
 
 //Get user by ID
-const userId = (req, res) => {
-    res.status(201).json({
+exports.userId = async (req, res, next) => {
+    try{
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const results = await db.collection('users').findOne({_id: id});
+    if (!results){
+        res.status(404).json({
+            status: 'fail',
+            message: 'Couldnt find user'
+        });
+    }
+    res.status(200).json({
         status: 'success',
-        message: 'You have successfully found user by id'
+        message: 'You have successfully found user by id',
+        user: results
     });
+}
+catch (err){
+    next(err);
+}
 };
 
 
-//Edit user by ID
-const editUser = (req, res) => {
-    res.status(201).json({
+// Edit/Update user by ID
+exports.editUser = async (req, res, next) => {
+    try{
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const updates = req.body;
+    const results = await db.collection('users').updateOne(
+        {_id: id},
+        {$set: updates}
+    );
+    if (results.matchedCount === 0) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'User not found with that id'
+        });
+    }
+    res.status(202).json({
         status: 'success',
-        message: 'You have successfully edited user'
+        message: 'You have successfully edited user',
+        matchedCount: results.matchedCount,
+        modifiedCount: results.modifiedCount
     })
+}
+    catch (err){
+        next(err);
+}
 }
 
 
 // Delete User
-const deleteUser = (req, res) => {
-    res.status(201).json({
+exports.deleteUser = async (req, res, next) => {
+    try{
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const results = await db.collection('users').deleteOne({_id: id});
+    if (results.deletedCount === 0){
+        res.status(404).json({
+            status: 'failed'
+        });
+    }
+    res.status(200).json({
         status: 'success',
+        deletedCount: results.deletedCount,
         message: 'You have successfully deleted user'
     })
+}
+    catch (err){
+        next(err);
+}
 }

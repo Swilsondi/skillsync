@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 3000; // Defines the port to listen on.
 //Database integration
 const { MongoClient, ServerApiVersion } = require('mongodb'); // Connects your backend to MongoDB. MongoClient gives you access to your MongoDB collections.
 const uri = "mongodb+srv://Swilsondi:<db_password>@cluster0.yshmqtk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
+const mongoose = require('mongoose');
 
 //Middleware these handle errors like 404 or 500.
 const notFound = require('./backend/middleware/notFound');
