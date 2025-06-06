@@ -106,11 +106,34 @@ catch (err){
 };
 
 // Mark as claimed
-const markClaimed = (req, res) => {
-  res.status(201).json({
+exports.markClaimed = async (req, res, next) => {
+  try{
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const result = await db.collection('tasks').updateOne(
+      { _id: id },
+      { $set: {isClaimed: true , claimedAt: new Date() , assignedTo: req.userId } }
+    );
+    if (result.matchedCount === 0){
+      res.status(404).json({
+        status: 'fail',
+        message: 'Task not found',
+        data: result
+      })
+      return;
+    }
+  res.status(200).json({
       status: 'success',
-      message: 'You have successfully marked this task as claimed'
+      message: 'You have successfully marked this task as claimed',
+      data: [
+        {modifiedCount: result.modifiedCount},
+        {matchedCount: result.matchedCount}
+      ]
   });
+}
+catch (err){
+  next(err);
+}
 };
 
 // Add comment
