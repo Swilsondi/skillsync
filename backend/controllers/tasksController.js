@@ -1,3 +1,4 @@
+const { ObjectId} = require('mongodb');
 // Get all tasks
 exports.getAllTasks = async (req, res, next) => {
   try {
@@ -81,11 +82,27 @@ const removeTask = (req, res) => {
 };
 
 // Get comment
-const getComment = (req, res) => {
+exports.getComment = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const result = await db.collection('tasks').findOne({_id: id});
+    if (!result.comment){
+      res.status(400).json({
+        status: 'fail',
+        message: 'Comment is not found'
+      })
+      return;
+    }
   res.status(200).json({
       status: 'success',
-      message: 'You successfully retrieved a comment'
+      message: 'You successfully retrieved a comment',
+      data: result.comment
   });
+}
+catch (err){
+  next(err);
+}
 };
 
 // Mark as claimed
@@ -97,9 +114,39 @@ const markClaimed = (req, res) => {
 };
 
 // Add comment
-const addComment = (req, res) => {
-  res.status(201).json({
+exports.addComment = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const { text, author, title, assignedTo,  } = req.body;
+    const results = await db.collection('tasks').updateOne(
+      { _id: id }, // this is the filter
+  { $set: { title, assignedTo }, 
+      $push: {
+      comments: {
+        text,
+        author,
+        createdAt: new Date()
+      }
+    }
+  }
+    );
+    if (results.matchedCount === 0){
+      res.status(400).json({
+        status: 'fail',
+        message: 'Task not found. Unable to add comment.'
+      })
+      return;
+    }
+  res.status(200).json({
       status: 'success',
-      message: 'You have successfully added a comment'
+      message: 'You have successfully added a comment',
+      data: results, 
+      matchedCount: results.matchedCount,
+      modifiedCount: results.modifiedCount,
   });
+}
+catch (err){
+  next(err);
+}
 };
