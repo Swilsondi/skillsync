@@ -74,11 +74,29 @@ exports.editTask = async (req, res, next) => {
 };
 
 // Remove Task
-const removeTask = (req, res) => {
+exports.removeTask = async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const id = new ObjectId(req.params.id);
+    const result = await db.collection('tasks').deleteOne(
+      {_id: id}
+    );
+    if (result.deletedCount === 0){
+      res.status(404).json({
+        status: 'fail',
+        message: 'Task not found'
+      });
+    }
   res.status(200).json({
       status: 'success',
-      message: 'You successfully removed the task by ID.'
+      message: 'You successfully removed the task by ID.',
+      data: [
+        {deletedCount: result.deletedCount}
+      ]
   });
+} catch (err) {
+  next(err);
+}
 };
 
 // Get comment
