@@ -4,7 +4,15 @@ exports.getAllTasks = async (req, res, next) => {
   try {
     const db = req.app.locals.db;
     const tasks = await db.collection('tasks').find().toArray();
-    res.status(200).json({ status: 'success', data: tasks });
+    const transformedTasks = tasks.map(task => ({
+      title: task.title,
+      isClaimed: task.isClaimed
+    }));
+    res.status(200).json({ 
+      status: 'success', 
+      data: tasks,
+      transformed: transformedTasks
+    });
   } catch (err) {
     next(err);
   }
