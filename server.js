@@ -1,18 +1,19 @@
-require('dotenv').config(); // Loads values from .env file (like DB name and password).
-const express = require('express'); // Brings in Express (web server).
+require("dotenv").config(); // Loads values from .env file (like DB name and password).
+const express = require("express"); // Brings in Express (web server).
 const PORT = process.env.PORT || 3000; // Defines the port to listen on.
 //Database integration
-const { MongoClient, ServerApiVersion } = require('mongodb'); // Connects your backend to MongoDB. MongoClient gives you access to your MongoDB collections.
-const uri = "mongodb+srv://Swilsondi:<db_password>@cluster0.yshmqtk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const mongoose = require('mongoose');
+const { MongoClient, ServerApiVersion } = require("mongodb"); // Connects your backend to MongoDB. MongoClient gives you access to your MongoDB collections.
+const uri =
+  "mongodb+srv://Swilsondi:<db_password>@cluster0.yshmqtk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const mongoose = require("mongoose");
 
 //Middleware these handle errors like 404 or 500.
-const notFound = require('./backend/middleware/notFound');
-const errorHandler = require('./backend/middleware/errorHandler');
+const notFound = require("./backend/middleware/notFound");
+const errorHandler = require("./backend/middleware/errorHandler");
 
 //Need to require the files to use them in this variable and them pass them to the middleware
-const taskRouter = require('./backend/routes/tasksRouter.js'); //These handle task and user-related routes.
-const userRouter = require('./backend/routes/usersRouter.js'); //These handle task and user-related routes.
+const taskRouter = require("./backend/routes/tasksRouter.js"); //These handle task and user-related routes.
+const userRouter = require("./backend/routes/usersRouter.js"); //These handle task and user-related routes.
 
 // Initialize Express app
 const app = express(); //This allows Express to read req.body (from POST/PUT requests).
@@ -36,23 +37,26 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
-async function startServer() { // Why? Because connecting to MongoDB is not instant. It takes time, and we don’t want the app to move forward until it’s ready.
+async function startServer() {
+  // Why async? Because connecting to MongoDB is not instant. It takes time, and we don’t want the app to move forward until it’s ready.
   try {
     // Connect the client to the server. Connects to your MongoDB database.
     await client.connect();
     //  Saves the DB connection into app.locals.db so every controller can use it. Send a ping to confirm a successful connection
     await client.db(process.env.DB_NAME).command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
 
     // Make the db accessible in controllers via req.app.locals.db
     app.locals.db = client.db(process.env.DB_NAME);
 
     // Mount routers at their base paths. Attaches the routers so any request to /api/v1/tasks is handled by the tasksRouter.js file.
-    app.use('/api/v1/tasks', taskRouter);
-    app.use('/api/v1/users', userRouter);
+    app.use("/api/v1/tasks", taskRouter);
+    app.use("/api/v1/users", userRouter);
 
     //Middleware  for errors
     app.use(notFound);
