@@ -7,6 +7,7 @@ exports.getAllTasks = async (req, res, next) => {
     const transformedTasks = tasks.map((task) => ({
       title: task.title,
       isClaimed: task.isClaimed,
+      assignedTo: task.assignedTo || "Unassigned",
     }));
     res.status(200).json({
       status: "success",
