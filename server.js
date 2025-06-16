@@ -29,7 +29,7 @@ app.use(express.json());
 // (Error middleware will be mounted after DB connection below)
 
 // ========== /////////// =========== //
-// ========== Server Started ======== //
+// ========== Server Starting ======== //
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
