@@ -3,18 +3,21 @@ const { ObjectId } = require("mongodb");
 exports.getAllTasks = async (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const tasks = await db.collection("tasks").find().toArray();
+    const tasks = await db.collection("tasks").find().toArray(); // Fetches all the resource tasks in the db collection. We find the task the user is searching and then converts the cursor into an array so we can manipulate and use it.
     const transformedTasks = tasks.map((task) => ({
+      // We are then using this map method to return a new object wwith the updated user task content.
       title: task.title,
       isClaimed: task.isClaimed,
       assignedTo: task.assignedTo || "Unassigned",
     }));
     res.status(200).json({
+      // We send the response back if our try block executes succesfully. Along with the variable we set earlier to return the new tasks.
       status: "success",
       data: tasks,
       transformed: transformedTasks,
     });
   } catch (err) {
+    // If anything in the try block fails then execute this peace of code.
     next(err);
   }
 };
