@@ -95,7 +95,11 @@ exports.removeTask = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "You successfully removed the task by ID.",
-      data: [{ deletedCount: result.deletedCount }],
+      data: [
+        {
+          deletedCount: result.deletedCount,
+        },
+      ],
     });
   } catch (err) {
     next(err);
