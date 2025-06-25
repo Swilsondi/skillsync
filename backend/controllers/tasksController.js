@@ -1,8 +1,7 @@
-const { ObjectId } = require("mongodb");
+const tasks = require("../models/taskModels");
 // Get all tasks
 exports.getAllTasks = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
     const tasks = await db.collection("tasks").find().toArray(); // Fetches all the resource tasks in the db collection. We find the task the user is searching and then converts the cursor into an array so we can manipulate and use it.
     const transformedTasks = tasks.map((task) => ({
       // We are then using this map method to return a new object wwith the updated user task content.
@@ -25,7 +24,6 @@ exports.getAllTasks = async (req, res, next) => {
 // Create a task
 exports.createTasks = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
     const result = await db.collection("tasks").insertOne(req.body);
     res.status(201).json({ status: "success", data: result.ops });
   } catch (err) {
@@ -36,9 +34,7 @@ exports.createTasks = async (req, res, next) => {
 // Get task by id
 exports.getTaskId = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
-    const id = new ObjectId(req.params.id);
-    const results = await db.collection("tasks").findOne({ _id: id });
+    const results = await db.collection("tasks").findById({ _id: id });
     if (!results) {
       res.status(404).json({
         status: "fail",
@@ -58,11 +54,9 @@ exports.getTaskId = async (req, res, next) => {
 // Edit Task
 exports.editTask = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
-    const id = new ObjectId(req.params.id);
     const results = await db
       .collection("tasks")
-      .updateOne({ _id: id }, { $set: req.body });
+      .findByIdAndUpdate({ _id: id }, { $set: req.body });
     if (results.matchedCount === 0) {
       res.status(404).json({
         status: "fail",
@@ -83,9 +77,7 @@ exports.editTask = async (req, res, next) => {
 // Remove Task
 exports.removeTask = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
-    const id = new ObjectId(req.params.id);
-    const result = await db.collection("tasks").deleteOne({ _id: id });
+    const result = await db.collection("tasks").findByIdAndDelete({ _id: id });
     if (result.deletedCount === 0) {
       res.status(404).json({
         status: "fail",
@@ -109,9 +101,7 @@ exports.removeTask = async (req, res, next) => {
 // Get comment
 exports.getComment = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
-    const id = new ObjectId(req.params.id);
-    const result = await db.collection("tasks").findOne({ _id: id });
+    const result = await db.collection("tasks").findbyId({ _id: id });
     if (!result.comment) {
       res.status(400).json({
         status: "fail",
@@ -132,9 +122,7 @@ exports.getComment = async (req, res, next) => {
 // Mark as claimed
 exports.markClaimed = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
-    const id = new ObjectId(req.params.id);
-    const result = await db.collection("tasks").updateOne(
+    const result = await db.collection("tasks").findByIdAndUpdate(
       { _id: id },
       {
         $set: {
@@ -168,10 +156,8 @@ exports.markClaimed = async (req, res, next) => {
 // Add comment
 exports.addComment = async (req, res, next) => {
   try {
-    const db = req.app.locals.db;
-    const id = new ObjectId(req.params.id);
     const { text, author, title, assignedTo } = req.body;
-    const results = await db.collection("tasks").updateOne(
+    const results = await db.collection("tasks").findByIdAndUpdate(
       { _id: id }, // this is the filter
       {
         $set: { title, assignedTo },
