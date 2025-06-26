@@ -182,3 +182,23 @@ exports.addComment = async (req, res, next) => {
     next(err);
   }
 };
+
+//Practicing writing controller functions
+exports.deleteTask = async (req, res, next) => {
+  try {
+    const task = await Task.findByIdAndDelete(req.params.id);
+    if (!task) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Task not found",
+      });
+    }
+    res.status(204).json({
+      status: "success",
+      message: "Succesfully deleted task",
+      data: task,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
