@@ -14,7 +14,7 @@ const tasksController = require("../controllers/tasksController");
 // Main collection routes (use controller logic for DB access)
 router
   .get("/", tasksController.getAllTasks) // GET all tasks
-  .post("/", tasksController.createTasks); // POST create a new task
+  .post("/", tasksController.createTask); // POST create a new task
 
 // Individual task routes
 //This listens for a GET request at /api/v1/tasks (because in server.js you mounted it at /api/v1/tasks)

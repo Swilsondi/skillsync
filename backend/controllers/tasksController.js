@@ -2,7 +2,7 @@ const tasks = require("../models/taskModels");
 // Get all tasks
 exports.getAllTasks = async (req, res, next) => {
   try {
-    const tasks = await db.collection("tasks").find().toArray(); // Fetches all the resource tasks in the db collection. We find the task the user is searching and then converts the cursor into an array so we can manipulate and use it.
+    const tasks = await Task.find(); // Fetches all the resource tasks in the db collection. We find the task the user is searching for
     const transformedTasks = tasks.map((task) => ({
       // We are then using this map method to return a new object wwith the updated user task content.
       title: task.title,
@@ -22,10 +22,10 @@ exports.getAllTasks = async (req, res, next) => {
 };
 
 // Create a task
-exports.createTasks = async (req, res, next) => {
+exports.createTask = async (req, res, next) => {
   try {
-    const result = await db.collection("tasks").insertOne(req.body);
-    res.status(201).json({ status: "success", data: result.ops });
+    const task = await Task.create(req.body);
+    res.status(201).json({ status: "success", data: task });
   } catch (err) {
     next(err);
   }
@@ -34,9 +34,9 @@ exports.createTasks = async (req, res, next) => {
 // Get task by id
 exports.getTaskId = async (req, res, next) => {
   try {
-    const results = await db.collection("tasks").findById({ _id: id });
-    if (!results) {
-      res.status(404).json({
+    const task = await Task.findById({ _id: id });
+    if (!Task) {
+      return res.status(404).json({
         status: "fail",
         message: "Task not found",
       });
@@ -44,21 +44,22 @@ exports.getTaskId = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "You successfully got the task by ID.",
-      tasks: results,
+      data: task,
     });
   } catch (err) {
     next(err);
   }
 };
 
-// Edit Task
+// Edit Task by ID
 exports.editTask = async (req, res, next) => {
   try {
-    const results = await db
-      .collection("tasks")
-      .findByIdAndUpdate({ _id: id }, { $set: req.body });
-    if (results.matchedCount === 0) {
-      res.status(404).json({
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!task) {
+      return res.status(404).json({
         status: "fail",
         message: "Resource not found",
       });
@@ -66,8 +67,7 @@ exports.editTask = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "You successfully edited the task by ID.",
-      matchedCount: results.matchedCount,
-      modifiedCount: results.modifiedCount,
+      data: task,
     });
   } catch (err) {
     next(err);
@@ -77,9 +77,9 @@ exports.editTask = async (req, res, next) => {
 // Remove Task
 exports.removeTask = async (req, res, next) => {
   try {
-    const result = await db.collection("tasks").findByIdAndDelete({ _id: id });
-    if (result.deletedCount === 0) {
-      res.status(404).json({
+    const task = await Task.findByIdAndDelete(req.params.id);
+    if (!task) {
+      return res.status(404).json({
         status: "fail",
         message: "Task not found",
       });
@@ -87,11 +87,7 @@ exports.removeTask = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "You successfully removed the task by ID.",
-      data: [
-        {
-          deletedCount: result.deletedCount,
-        },
-      ],
+      data: task,
     });
   } catch (err) {
     next(err);
@@ -101,18 +97,24 @@ exports.removeTask = async (req, res, next) => {
 // Get comment
 exports.getComment = async (req, res, next) => {
   try {
-    const result = await db.collection("tasks").findbyId({ _id: id });
-    if (!result.comment) {
-      res.status(400).json({
+    const { text, author } = req.body;
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({
         status: "fail",
-        message: "Comment is not found",
+        message: "Task not found. Unable to add comment.",
       });
-      return;
     }
-    res.status(200).json({
+    task.comments.push({
+      text,
+      author,
+      createdAt: new Date(),
+    });
+    await task.save();
+    res.status(201).json({
       status: "success",
-      message: "You successfully retrieved a comment",
-      data: result.comment,
+      message: "You have successfully added a comment",
+      data: task,
     });
   } catch (err) {
     next(err);
@@ -122,31 +124,25 @@ exports.getComment = async (req, res, next) => {
 // Mark as claimed
 exports.markClaimed = async (req, res, next) => {
   try {
-    const result = await db.collection("tasks").findByIdAndUpdate(
-      { _id: id },
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
       {
-        $set: {
-          isClaimed: true,
-          claimedAt: new Date(),
-          assignedTo: req.userId,
-        },
-      }
+        isClaimed: true,
+        claimedAt: new Date(),
+        assignedTo: req.userId,
+      },
+      { new: true }
     );
-    if (result.matchedCount === 0) {
-      res.status(404).json({
+    if (!task) {
+      return res.status(404).json({
         status: "fail",
         message: "Task not found",
-        data: result,
       });
-      return;
     }
     res.status(200).json({
       status: "success",
       message: "You have successfully marked this task as claimed",
-      data: [
-        { modifiedCount: result.modifiedCount },
-        { matchedCount: result.matchedCount },
-      ],
+      data: task,
     });
   } catch (err) {
     next(err);
@@ -157,8 +153,8 @@ exports.markClaimed = async (req, res, next) => {
 exports.addComment = async (req, res, next) => {
   try {
     const { text, author, title, assignedTo } = req.body;
-    const results = await db.collection("tasks").findByIdAndUpdate(
-      { _id: id }, // this is the filter
+    const task = await Task.findByIdAndUpdate(
+      req.params.id, // Use the ID directly
       {
         $set: { title, assignedTo },
         $push: {
@@ -168,21 +164,19 @@ exports.addComment = async (req, res, next) => {
             createdAt: new Date(),
           },
         },
-      }
+      },
+      { new: true } // Return the updated document
     );
-    if (results.matchedCount === 0) {
-      res.status(400).json({
+    if (!task) {
+      return res.status(404).json({
         status: "fail",
         message: "Task not found. Unable to add comment.",
       });
-      return;
     }
     res.status(200).json({
       status: "success",
       message: "You have successfully added a comment",
-      data: results,
-      matchedCount: results.matchedCount,
-      modifiedCount: results.modifiedCount,
+      data: task,
     });
   } catch (err) {
     next(err);
