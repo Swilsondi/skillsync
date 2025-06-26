@@ -1,4 +1,5 @@
 const User = require("../models/User");
+//TODO: incorporate map, filter, reduce, some, find, etc.
 
 // Get all users
 exports.getAllUsers = async (req, res, next) => {

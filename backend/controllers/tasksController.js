@@ -38,7 +38,7 @@ exports.createTask = async (req, res, next) => {
 // Get task by id
 exports.getTaskId = async (req, res, next) => {
   try {
-    const task = await Task.findById({ _id: id });
+    const task = await Task.findById(req.params.id);
     if (!Task) {
       return res.status(404).json({
         status: "fail",
