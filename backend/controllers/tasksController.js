@@ -82,6 +82,8 @@ exports.editTask = async (req, res, next) => {
 exports.removeTask = async (req, res, next) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.id);
+    const removeUnclaimed = await Task.find({ isClaimed: false });
+    const removeClaimed = await Task.find({ isClaimed: true });
     if (!task) {
       return res.status(404).json({
         status: "fail",
@@ -92,6 +94,8 @@ exports.removeTask = async (req, res, next) => {
       status: "success",
       message: "You successfully removed the task by ID.",
       data: task,
+      unclaimed: removeUnclaimed,
+      claimed: removeClaimed,
     });
   } catch (err) {
     next(err);
