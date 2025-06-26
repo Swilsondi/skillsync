@@ -1,13 +1,17 @@
 const tasks = require("../models/taskModels");
+//TODO: incorporate map, filter, reduce, some, find, etc.
+
 // Get all tasks
 exports.getAllTasks = async (req, res, next) => {
   try {
     const tasks = await Task.find(); // Fetches all the resource tasks in the db collection. We find the task the user is searching for
+    const unclaimedTasks = tasks.filter((task) => task.isClaimed === "false");
     const transformedTasks = tasks.map((task) => ({
       // We are then using this map method to return a new object wwith the updated user task content.
       title: task.title,
       isClaimed: task.isClaimed,
       assignedTo: task.assignedTo || "Unassigned",
+      unclaimedTasks: unclaimedTasks,
     }));
     res.status(200).json({
       // We send the response back if our try block executes succesfully. Along with the variable we set earlier to return the new tasks.
@@ -176,26 +180,6 @@ exports.addComment = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "You have successfully added a comment",
-      data: task,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-//Practicing writing controller functions
-exports.deleteTask = async (req, res, next) => {
-  try {
-    const task = await Task.findByIdAndDelete(req.params.id);
-    if (!task) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Task not found",
-      });
-    }
-    res.status(204).json({
-      status: "success",
-      message: "Succesfully deleted task",
       data: task,
     });
   } catch (err) {

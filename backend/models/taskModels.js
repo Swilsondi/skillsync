@@ -11,7 +11,7 @@ const taskSchema = new mongoose.Schema({
   tags: [String],
   skillLevel: { type: String, enum: ["beginner", "intermediate", "advanced"] },
   postedBy: String,
-  claimed: { type: Boolean, default: false },
+  isClaimed: { type: Boolean, default: false },
   comments: [commentSchema],
   createdAt: { type: Date, default: Date.now },
 });
